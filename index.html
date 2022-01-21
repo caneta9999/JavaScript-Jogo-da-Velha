@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Jogo da Velha</title>
+</head>
+<body>
+    <h1>Jogo da Velha</h1>
+    <div id="divMaior">
+        <div id="divColuna1">
+            <div id="div1" onClick="jogada(1,0)" class="divsMenores"></div>
+            <div id="div2" onClick="jogada(2,0)" class="divsMenores"></div>
+            <div id="div3" onClick="jogada(3,0)" class="divsMenores"></div>
+        </div>
+        <div id="divColuna2">
+            <div id="div4" onClick="jogada(4,0)" class="divsMenores"></div>
+            <div id="div5" onClick="jogada(5,0)" class="divsMenores"></div>
+            <div id="div6" onClick="jogada(6,0)" class="divsMenores"></div>
+        </div>
+        <div id="divColuna3">
+            <div id="div7" onClick="jogada(7,0)" class="divsMenores"></div>
+            <div id="div8" onClick="jogada(8,0)" class="divsMenores"></div>
+            <div id="div9" onClick="jogada(9,0)" class="divsMenores"></div>
+        </div>
+    </div>
+    <div id="divResultado"></div>
+    <div id="divBtns">
+        <button id="btnContraBot" onClick="iniciarJogoBot()">vs Bot</button>
+        <button id="btnContraPessoa" onClick="iniciarJogoPessoa()">vs Pessoa</button>
+    </div>
+    <script>
+        function iniciarJogo(){
+            if(sessionStorage.jogoFinalizado){
+                for(var i=1; i<=9;i++){
+                    document.getElementById('div' + i).innerHTML = ''
+                    document.getElementById('div' + i).style.backgroundColor = ''
+                }
+                document.getElementById('divResultado').innerHTML = ''
+            }
+            //se der F5 no navegador será um problema, então deixei esse reset também, embora não precise na maioria dos casos
+            var divMaior = document.getElementById('divMaior')
+            divMaior.style.visibility = "visible"
+
+            sessionStorage.proximaJogada = 'X'
+            sessionStorage.setItem("jogadas", JSON.stringify(['','','','','','','','','']))
+            sessionStorage.jogoFinalizado = 0
+            sessionStorage.numeroJogadas = 0
+            document.getElementById('divBtns').style.visibility = "hidden"
+        }
+        function iniciarJogoBot(){
+            iniciarJogo()
+            sessionStorage.tipoJogo = 'bot'
+            var comeco = gerarNumeroAleatorio(0,1)
+            //bot faz a jogada inicial
+            if(comeco == 1){
+                sessionStorage.jogadores = 'XO-'
+                jogada(gerarNumeroAleatorio(1,9),1)}
+            else{
+                sessionStorage.jogadores = 'OX-'}
+        }
+        function iniciarJogoPessoa(){
+            iniciarJogo()
+            sessionStorage.tipoJogo = 'pessoa'
+            
+            // a primeira letra representa o bot, a segunda representa o jogador 1 e a terceira letra representa o jogador 2 
+            sessionStorage.jogadores = '-XO'
+        }
+        function jogada(posicao, jogadaBot){
+            var div = 'div' + posicao
+            var divJogada = document.getElementById(div)
+            if(JSON.parse(sessionStorage.jogadas)[posicao-1] == "" && Number(sessionStorage.jogoFinalizado)==0){
+                divJogada.innerHTML = sessionStorage.proximaJogada
+
+                var jogadas = JSON.parse(sessionStorage.jogadas)
+                jogadas[posicao-1] = sessionStorage.proximaJogada
+                sessionStorage.setItem("jogadas",JSON.stringify(jogadas))
+                
+                sessionStorage.numeroJogadas = Number(sessionStorage.numeroJogadas) + 1
+                sessionStorage.proximaJogada = (sessionStorage.proximaJogada == 'X')?'O':'X'
+                determinarVencedor()
+            }
+            else{
+                return null
+            }
+            if(Number(sessionStorage.jogoFinalizado) == 0 && jogadaBot == 0 && sessionStorage.tipoJogo == 'bot'){
+                jogadaAleatoria = gerarNumeroAleatorio(1,9)
+                while(JSON.parse(sessionStorage.jogadas)[jogadaAleatoria-1] != ""){
+                    jogadaAleatoria = gerarNumeroAleatorio(1,9)
+                }
+                jogada(jogadaAleatoria, 1)
+            }
+        }
+        function determinarVencedor(){
+            var acabou = 0
+            var jogadas = JSON.parse(sessionStorage.jogadas)
+            //verificar na vertical
+            if(jogadas[0] != '' && jogadas[0] == jogadas[1] && jogadas[1] == jogadas[2]){
+                acabou = jogadas[0]
+                sessionStorage.celulasVencedoras = '012'
+            }
+            if(jogadas[3] != '' && jogadas[3] == jogadas[4] && jogadas[4] == jogadas[5]){
+                acabou = jogadas[3]
+                sessionStorage.celulasVencedoras = '345'
+            }
+            if(jogadas[6] != '' && jogadas[6] == jogadas[7] && jogadas[7] == jogadas[8]){
+                acabou = jogadas[6]
+                sessionStorage.celulasVencedoras = '678'
+            }
+            //verificar na horizontal
+            if(jogadas[0] != '' && jogadas[0] == jogadas[3] && jogadas[3] == jogadas[6]){
+                acabou = jogadas[0]
+                sessionStorage.celulasVencedoras = '036'
+            }
+            if(jogadas[1] != '' && jogadas[1] == jogadas[4] && jogadas[4] == jogadas[7]){
+                acabou = jogadas[1]
+                sessionStorage.celulasVencedoras = '147'
+            }
+            if(jogadas[2] != '' && jogadas[2] == jogadas[5] && jogadas[5] == jogadas[8]){
+                acabou = jogadas[2]
+                sessionStorage.celulasVencedoras = '258'
+            }
+            //verificar na diagonal
+            if(jogadas[0] != '' && jogadas[0] == jogadas[4] && jogadas[4] == jogadas[8]){
+                acabou = jogadas[0]
+                sessionStorage.celulasVencedoras = '048'
+            }
+            if(jogadas[2] != '' && jogadas[2] == jogadas[4] && jogadas[4] == jogadas[6]){
+                acabou = jogadas[2]
+                sessionStorage.celulasVencedoras = '246'
+            }
+            if(acabou != 0){
+                finalizarJogo(1, acabou)
+            }
+            else if(sessionStorage.numeroJogadas == 9){
+                finalizarJogo(0, acabou)
+            }                       
+        }
+        function finalizarJogo(vencedor, jogadorVencedor){
+            var resultado = document.getElementById('divResultado')
+            if(vencedor == 1){
+                var verificaVencedor;
+                if(jogadorVencedor == sessionStorage.jogadores[0]){
+                    verificaVencedor = 'Computador'
+                }else if(jogadorVencedor == sessionStorage.jogadores[1]){
+                    verificaVencedor = 'Player 1'
+                }else{
+                    verificaVencedor = 'Player 2'
+                }
+                resultado.innerHTML = '<p>Jogo finalizado! ' + verificaVencedor + ' é o vencedor</p>'
+                for(i=0;i<=2;i++){
+                    document.getElementById('div' + (Number(sessionStorage.celulasVencedoras[i])+1)).style.backgroundColor = '#ea8c95'
+                }                
+            }
+            else{
+                resultado.innerHTML = '<p>Deu velha!</p>'   
+            }
+            sessionStorage.jogoFinalizado = 1
+            sessionStorage.proximaJogada = ''
+            sessionStorage.jogadas = ''
+            sessionStorage.numeroJogadas = 0
+            sessionStorage.jogadores = ''
+            sessionStorage.celulasVencedoras = ''
+            
+            document.getElementById('divBtns').style.visibility = "visible"
+        }
+        function gerarNumeroAleatorio(minimo, maximo) {
+           return Math.round(Math.random() * (maximo - minimo)) + minimo
+        }
+    </script>
+</body>
+</html>

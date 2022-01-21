@@ -1,0 +1,38 @@
+html{
+    height: 100%;
+    font-family: Verdana, Tahoma, sans-serif;
+}
+body{
+    text-align: center;
+    background: rgb(235,230,248);
+    background: linear-gradient(180deg, rgba(235,230,248,0.7) 0%, rgba(90,80,139,0.7) 100%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 90%;
+}
+#divMaior{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+    visibility: hidden;
+}
+#div2,#div5,#div8{
+    border-bottom: 2px solid black;
+    border-top: 2px solid black;
+}
+#div4,#div5,#div6{
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+}
+.divsMenores{
+    text-align: center;
+    min-height: 50px;
+    padding-top: 20px;
+}
+.divsMenores:hover{
+    transition: 1s;
+    background-color:azure;
+}
